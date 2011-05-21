@@ -12,7 +12,7 @@ app.set('view options', {
 
 // controllers and actions
 app.get('/', function(req, res) {
-  res.render('index', {locals: {name: 'haha'}});
+  res.render('index');
   // res.send("haha");
 });
 

@@ -13,24 +13,26 @@
       }
     </style>
     <script type="text/javascript" language="javascript" charset="utf-8">
-      function drawItem(item) {
-        $item = item;
-        $item.attr('bgcolor', 'green');
+      var colours = ['#eee', '#abc', '#ebc', '#daf'];
+      var colour = colours[parseInt(Math.random(1) * colours.length)];
+
+      function drawItem(item, colour) {
+        item.attr('bgcolor', colour);
       }
 
       var socket = new io.Socket(null);
       socket.connect();
       socket.on("connect", function() {socket.send("hi")});
       socket.on("message", function(data) {
-        drawItem($("#" + data.domId));
+        drawItem($("#" + data.domId), data.colour);
       });
       socket.on("disconnect", function() {});
 
       $(function() {
           $("td").click(function() {
             $item = $(this);
-            drawItem($item);
-            socket.send({domId: $item.attr('id')});
+            drawItem($item, colour);
+            socket.send({domId: $item.attr('id'), colour: colour});
           });
       });
     </script>
