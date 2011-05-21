@@ -2,6 +2,7 @@
 var express = require('express');
 var app = express.createServer();
 require('ejs');
+var io = require('socket.io');
 
 // settings
 app.set( "view engine", "ejs" );
@@ -16,3 +17,13 @@ app.get('/', function(req, res) {
 });
 
 app.listen(3000);
+
+// socket.io
+var socket = io.listen(app);
+socket.on('connection', function(client) {
+  client.on('message', function(data) {
+    client.broadcast(data);
+  });
+  // client.broadcast({announcement: 'haha'})
+  client.on('disconnect', function() {});
+});

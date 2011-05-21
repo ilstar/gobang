@@ -3,20 +3,45 @@
     <title>五子棋</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <!--link href='stylesheets/site.css' rel='stylesheet' type='text/css' /-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <% var boardLength = 18; %>
     <style type="text/css" media="screen">
       table tr td {
-        border-color: green;
-        padding: 10px;
+        border: 1px solid #ddd;
+        padding: 18;
       }
     </style>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+      function drawItem(item) {
+        $item = item;
+        $item.attr('bgcolor', 'green');
+      }
+
+      var socket = new io.Socket(null);
+      socket.connect();
+      socket.on("connect", function() {socket.send("hi")});
+      socket.on("message", function(data) {
+        drawItem($("#" + data.domId));
+      });
+      socket.on("disconnect", function() {});
+
+      $(function() {
+          $("td").click(function() {
+            $item = $(this);
+            drawItem($item);
+            socket.send({domId: $item.attr('id')});
+          });
+      });
+    </script>
   </head>
   <body>
     <table>
       <% for (var i = 0; i < boardLength; i++ ) { %>
         <tr>
           <% for (var j = 0; j < boardLength; j++) { %>
-            <td data-x="<%= i %>" data-y="<%= j %>">dd</td>
+          <td id="item_<%= i %>_<%= j %>">
+          </td>
           <% } %>
         </tr>
       <% } %>
