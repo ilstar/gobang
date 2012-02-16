@@ -1,10 +1,12 @@
-app = require('express').createServer()
+express = require 'express'
+app = express.createServer()
 io = require('socket.io').listen app
 require 'ejs'
 
 # setting
 app.set 'view engine', 'ejs'
 app.set "view options", layout: false
+app.use express.static(__dirname + '/public')
 
 app.get '/', (req, res) ->
   res.render 'index'

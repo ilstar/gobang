@@ -2,41 +2,13 @@
   <head>
     <title>五子棋</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <!--link href='stylesheets/site.css' rel='stylesheet' type='text/css' /-->
+    <link href='stylesheets/site.css' rel='stylesheet' type='text/css' />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript" charset="utf-8"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/application.js"></script>
     <% var boardLength = 18; %>
-    <style type="text/css" media="screen">
-      table tr td {
-        border: 1px solid #ddd;
-        padding: 18;
-      }
-    </style>
-    <script type="text/javascript" language="javascript" charset="utf-8">
-      var colours = ['#eee', '#abc', '#ebc', '#daf'];
-      var colour = colours[parseInt(Math.random(1) * colours.length)];
-
-      function drawItem(item, colour) {
-        item.attr('bgcolor', colour);
-      }
-
-      var socket = io.connect(null);
-      socket.on("connect", function() {socket.send("hi, I'm connect...")});
-      socket.on('allNews', function(data) {
-        console.log(data);
-        drawItem($("#" + data.domId), data.colour);
-      });
-      socket.on("disconnect", function() {});
-
-      $(function() {
-          $("td").click(function() {
-            $item = $(this);
-            drawItem($item, colour);
-            socket.emit('news', {domId: $item.attr('id'), colour: colour});
-          });
-      });
-    </script>
   </head>
+
   <body>
     <table>
       <% for (var i = 0; i < boardLength; i++ ) { %>
