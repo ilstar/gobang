@@ -25,9 +25,14 @@ app.listen 3000
 io.sockets.on 'connection', (socket) ->
   console.log 'a client connected...'
 
-  socket.on 'news', (data) ->
+  socket.on 'move', (data) ->
     console.log "new message - #{data}"
+    data.count = ++pointCount
     socket.broadcast.emit 'allNews', data
+
+  socket.on 'register', (data) ->
+    # data format: {user_id: xx}
+    socket.emit 'register', flag: pointCount % 2 is (data.user_id - 1)
 
   socket.on 'disconnect', ->
     console.log 'a client disconnected...'

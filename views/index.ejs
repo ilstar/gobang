@@ -5,13 +5,15 @@
     <link href='stylesheets/site.css' rel='stylesheet' type='text/css' />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript" charset="utf-8"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+      var user = {name: "<%= current_user.name %>", id: <%= current_user.id %>}
+    </script>
     <script src="/javascripts/application.js"></script>
     <% var boardLength = 18; %>
   </head>
 
   <body>
     <div>
-      current_user <%= current_user.name %>
     </div>
     <table>
       <% for (var i = 0; i < boardLength; i++ ) { %>
