@@ -1,12 +1,10 @@
 (function() {
-  var colour, colours, drawItem, socket, user;
+  var colour, drawItem, socket, user;
 
-  colours = ['#eee', '#abc', '#ebc', '#daf'];
+  colour = "#efd";
 
-  colour = colours[parseInt(Math.random(1) * colours.length)];
-
-  drawItem = function(item, colour) {
-    return item.attr('bgcolor', colour);
+  drawItem = function(x, y, colour) {
+    return $("td[data-x=" + x + "][data-y=" + y + "]").attr('bgcolor', colour);
   };
 
   user = window.user;
@@ -20,28 +18,28 @@
   });
 
   socket.on('allNews', function(data) {
-    console.log(data);
-    drawItem($("#" + data.domId), data.colour);
-    return user.flag = data.count % 2 === (user.id - 1);
+    drawItem(data.x, data.y, data.colour);
+    return user.canMove = !user.canMove;
   });
 
   socket.on('register', function(data) {
-    return user.flag = data.flag;
+    return user.canMove = data.canMove;
   });
 
   socket.on('disconnect', function() {});
 
   jQuery(function() {
     return $('td').click(function() {
-      var $item;
-      if (user.flag) {
+      var $item, x, y;
+      if (user.canMove) {
         $item = $(this);
-        drawItem($item, colour);
-        socket.emit('move', {
-          domId: $item.attr('id'),
-          colour: colour
+        x = $item.attr('data-x');
+        y = $item.attr('data-y');
+        drawItem(x, y, colour);
+        return socket.emit('move', {
+          x: x,
+          y: y
         });
-        return user.flag = false;
       } else {
         return alert("you can't move");
       }

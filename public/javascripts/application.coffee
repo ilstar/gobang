@@ -1,8 +1,7 @@
-colours = ['#eee', '#abc', '#ebc', '#daf']
-colour = colours[parseInt(Math.random(1) * colours.length)]
+colour = "#efd"
 
-drawItem = (item, colour) ->
-  item.attr('bgcolor', colour)
+drawItem = (x, y, colour) ->
+  $("td[data-x=#{x}][data-y=#{y}]").attr('bgcolor', colour)
 
 user = window.user
 socket = io.connect null
@@ -10,21 +9,21 @@ socket = io.connect null
 socket.on 'connect', ->
   socket.emit 'register', user_id: user.id
 socket.on 'allNews', (data) ->
-  console.log data
-  drawItem($("##{data.domId}"), data.colour)
-  user.flag = data.count % 2 is (user.id - 1)
+  drawItem(data.x, data.y, data.colour)
+  user.canMove = not user.canMove
 
 socket.on 'register', (data) ->
-  # data format: {flag: true/false}
-  user.flag = data.flag
+  # data format: {canMove: true/false}
+  user.canMove = data.canMove
 socket.on 'disconnect', ->
 
 jQuery ->
   $('td').click ->
-    if user.flag
+    if user.canMove
       $item = $(this)
-      drawItem($item, colour)
-      socket.emit('move', {domId: $item.attr('id'), colour: colour})
-      user.flag = false
+      x = $item.attr('data-x')
+      y = $item.attr('data-y')
+      drawItem(x, y, colour)
+      socket.emit('move', {x, y})
     else
       alert "you can't move"

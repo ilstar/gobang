@@ -14,12 +14,13 @@
 
   <body>
     <div>
+      <%= current_user.name %>
     </div>
     <table>
       <% for (var i = 0; i < boardLength; i++ ) { %>
         <tr>
           <% for (var j = 0; j < boardLength; j++) { %>
-          <td id="item_<%= i %>_<%= j %>">
+          <td data-x="<%= i %>" data-y="<%= j %>">
           </td>
           <% } %>
         </tr>
