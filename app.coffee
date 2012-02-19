@@ -40,8 +40,8 @@ io.set 'authorization', (data, callback) ->
     callback new Error "No cookie transmitted!"
 
 io.sockets.on 'connection', (socket) ->
-  console.log 'a client connected...'
   current_user = socket.handshake.session.current_user
+  console.log current_user
   chess = chesses['test']
 
   socket.on 'move', (data) ->

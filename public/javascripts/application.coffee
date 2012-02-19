@@ -33,5 +33,6 @@ jQuery ->
       drawItem(x, y, colour)
       user.canMove = false
       socket.emit('move', {x, y})
+      user.canMove = false
     else
       alert "you can't move"
