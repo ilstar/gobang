@@ -4,15 +4,15 @@ class Chess
     @chess = {}
 
   join: (player) ->
-    return if not @canJoin()
+    return if @isFull()
 
     @players = @players.concat player
     @chess[player.id] = []
     if @player1? then @player2 = player else @player1 = player
     return player
 
-  canJoin: ->
-    @players.length isnt 2
+  isFull: ->
+    @players.length is 2
 
   move: (player, x, y) ->
     return if not @canMove(player)
@@ -35,7 +35,7 @@ class Chess
       throw "exception"
 
   positionBeTaken: (x, y) ->
-    throw "error players number" if @canJoin()
+    throw "error players number" if not @isFull()
     for point in @chess[@player1.id]
       return true if point.x is x and point.y is y
     for point in @chess[@player2.id]

@@ -35,20 +35,20 @@ describe "Jasmine", ->
     it "can't join because it's full", ->
       expect(@chess.join new Player).toBe undefined
 
-  describe "canJoin", ->
+  describe "isFull", ->
     it "can when nobody join", ->
       chess = new Chess
 
-      expect(chess.canJoin @player1).toBe true
+      expect(chess.isFull @player1).toBe false
 
     it "can when only one person joined", ->
       chess = new Chess
       chess.join new Player
 
-      expect(chess.canJoin @player1).toBe true
+      expect(chess.isFull @player1).toBe false
 
     it "can not when two people have joined", ->
-      expect(@chess.canJoin new Player).toBe false
+      expect(@chess.isFull new Player).toBe true
 
   describe "move", ->
     it "can't move if not turn him", ->
