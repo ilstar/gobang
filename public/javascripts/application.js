@@ -42,12 +42,8 @@
         x = $item.attr('data-x');
         y = $item.attr('data-y');
         drawItem(x, y, colour);
-<<<<<<< HEAD
         user.canMove = false;
-        return socket.emit('move', {
-=======
         socket.emit('move', {
->>>>>>> fix bug, can`t move after you move
           x: x,
           y: y
         });
