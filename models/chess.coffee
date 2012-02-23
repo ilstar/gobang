@@ -4,39 +4,50 @@ class Chess
     @chess = {}
 
   join: (player) ->
-    if @canJoin()
-      if @players.length is 0 then @player1 = player else @player2 = player
-      @players = @players.concat player
-      @chess[player] = []
+    return if not @canJoin()
+
+    @players = @players.concat player
+    @chess[player.id] = []
+    if @player1? then @player2 = player else @player1 = player
+    return player
+
+  canJoin: ->
+    @players.length isnt 2
 
   move: (player, x, y) ->
     return if not @canMove(player)
-    @chess[player] = @chess[player].concat {x, y}
+    return if @positionBeTaken(x, y)
+    @chess[player.id] = @chess[player.id].concat {x, y}
 
   nextMovePlayer: ->
     throw "no player" if @players.length is 0
     @player1 if @players.length is 1
     if @canMove(@player1) then @player1 else @player2
-  canJoin: ->
-    @players.length isnt 2
+
   canMove: (player) ->
-    switch @players.length
-      when 0
-        throw "no player"
-      when 1
-        @player1
-      else
-        if player is @player1
-          @chess[@player1].length is @chess[@player2].length
-        else if player is @player2
-          @chess[@player1].length is (@chess[@player2].length + 1)
-        else
-          throw "exception"
+    throw "length isnt 2" if @players.length isnt 2
+
+    if player is @player1
+      @chess[@player1.id].length is @chess[@player2.id].length
+    else if player is @player2
+      @chess[@player1.id].length is (@chess[@player2.id].length + 1)
+    else
+      throw "exception"
+
+  positionBeTaken: (x, y) ->
+    throw "error players number" if @canJoin()
+    for point in @chess[@player1.id]
+      return true if point.x is x and point.y is y
+    for point in @chess[@player2.id]
+      return true if point.x is x and point.y is y
+    false
+
   anotherPlayer: (player) ->
-    throw "Players.length is not 2" if @players.length < 2
+    throw "length isnt 2" if @players.length < 2
     if @players[0] is player then @players[1] else @players[0]
+
   isWin: (player) ->
-    chess = @chess[player]
+    chess = @chess[player.id]
     lastChess = chess[chess.length - 1]
 
     # check horizontal
