@@ -67,9 +67,14 @@ describe "Jasmine", ->
 
     it "move successfully", ->
       count = @chess.chess[@player1.id].length
-      @chess.move @player1, 3, 3
 
+      expect(@chess.move @player1, 3, 3).toBe 'moved'
       expect(@chess.chess[@player1.id].length).toBe count + 1
+
+    it "return win if he win", ->
+      @chess.isWin = -> true # mock
+
+      expect(@chess.move @player1, 1, 1).toBe 'win'
 
   describe "positionBeTaken", ->
     it "false when no any point", ->

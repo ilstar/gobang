@@ -20,6 +20,14 @@
     return user.canMove = true;
   });
 
+  socket.on('win', function(data) {
+    if (data.user === 'you') {
+      return alert('you win');
+    } else {
+      return alert('so bad, he win!');
+    }
+  });
+
   socket.on('register', function(data) {
     return user.canMove = data.canMove;
   });

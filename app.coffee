@@ -48,8 +48,12 @@ io.sockets.on 'connection', (socket) ->
   chess = chesses['test']
 
   socket.on 'move', (data) ->
-    if chess.move current_user, data.x, data.y
+    result = chess.move current_user, parseInt(data.x), parseInt(data.y)
+    if result is 'moved'
       socket.broadcast.emit 'allNews', {x: data.x, y: data.y, colour: current_user.colour}
+    else if result is 'win'
+      socket.broadcast.emit 'win', {user: 'other'}
+      socket.emit 'win', {user: 'you'}
 
   socket.on 'register', (data) ->
     chess.join current_user

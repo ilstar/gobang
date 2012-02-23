@@ -19,6 +19,11 @@ class Chess
     return if @positionBeTaken(x, y)
     @chess[player.id] = @chess[player.id].concat {x, y}
 
+    if @isWin player
+      'win'
+    else
+      'moved'
+
   nextMovePlayer: ->
     throw "no player" if @players.length is 0
     @player1 if @players.length is 1

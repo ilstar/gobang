@@ -13,6 +13,12 @@ socket.on 'allNews', (data) ->
   drawItem(data.x, data.y, data.colour)
   user.canMove = true
 
+socket.on 'win', (data) ->
+  if data.user is 'you'
+    alert 'you win'
+  else
+    alert 'so bad, he win!'
+
 socket.on 'register', (data) ->
   # data format: {canMove: true/false}
   user.canMove = data.canMove
