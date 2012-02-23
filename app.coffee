@@ -4,7 +4,8 @@ io = require('socket.io').listen app
 sessionStore = new express.session.MemoryStore
 require 'ejs'
 parseCookie = require('connect').utils.parseCookie
-Chess = require "#{__dirname}/models/chess.coffee"
+Chess = require "#{__dirname}/models/chess"
+Player = require "#{__dirname}/models/player"
 
 # setting
 app.set 'view engine', 'ejs'
@@ -13,18 +14,14 @@ app.use express.static(__dirname + '/public')
 app.use express.cookieParser()
 app.use express.session secret: "secret string $#@$", store: sessionStore
 
-playerCount = 0
-
 chesses = {}
 chesses['test'] = new Chess
-colours = ['#eee', '#abc', '#ebc', '#daf']
 
 app.get '/', (req, res) ->
   if chesses['test'].isFull()
     res.send 'Sorry, the room is already full.'
   else
-    colour = colours[parseInt(Math.random(1) * colours.length)]
-    req.session.current_user ?= name: "player #{++playerCount}", id: playerCount, colour: colour
+    req.session.current_user ?= new Player
     res.render 'index', current_user: req.session.current_user
 
 app.listen 3000

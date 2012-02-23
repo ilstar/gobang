@@ -1,10 +1,5 @@
-Chess = require "#{__dirname}/../models/chess.coffee"
-
-count = 0
-class Player
-  constructor: ->
-    @name = "Player #{++count}"
-    @id = count
+Chess = require "#{__dirname}/../models/chess"
+Player = require "#{__dirname}/../models/player"
 
 describe "Jasmine", ->
   beforeEach ->
