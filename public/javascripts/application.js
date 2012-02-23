@@ -12,14 +12,12 @@
   socket = io.connect(null);
 
   socket.on('connect', function() {
-    return socket.emit('register', {
-      user_id: user.id
-    });
+    return socket.emit('register');
   });
 
   socket.on('allNews', function(data) {
     drawItem(data.x, data.y, data.colour);
-    return user.canMove = !user.canMove;
+    return user.canMove = true;
   });
 
   socket.on('register', function(data) {
@@ -36,6 +34,7 @@
         x = $item.attr('data-x');
         y = $item.attr('data-y');
         drawItem(x, y, colour);
+        user.canMove = false;
         return socket.emit('move', {
           x: x,
           y: y

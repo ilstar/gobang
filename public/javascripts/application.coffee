@@ -7,10 +7,11 @@ user = window.user
 socket = io.connect null
 
 socket.on 'connect', ->
-  socket.emit 'register', user_id: user.id
+  socket.emit 'register'
+
 socket.on 'allNews', (data) ->
   drawItem(data.x, data.y, data.colour)
-  user.canMove = not user.canMove
+  user.canMove = true
 
 socket.on 'register', (data) ->
   # data format: {canMove: true/false}
@@ -24,6 +25,7 @@ jQuery ->
       x = $item.attr('data-x')
       y = $item.attr('data-y')
       drawItem(x, y, colour)
+      user.canMove = false
       socket.emit('move', {x, y})
     else
       alert "you can't move"

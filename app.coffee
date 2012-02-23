@@ -14,19 +14,18 @@ app.use express.cookieParser()
 app.use express.session secret: "secret string $#@$", store: sessionStore
 
 playerCount = 0
-pointCount = 0
 
 chesses = {}
 chesses['test'] = new Chess
 colours = ['#eee', '#abc', '#ebc', '#daf']
 
 app.get '/', (req, res) ->
-  colour = colours[parseInt(Math.random(1) * colours.length)]
-  if playerCount <= 1
-    req.session.current_user ?= name: "player #{++playerCount}", id: playerCount, colour: colour
+  if chesses['test'].isFull()
+    res.send 'Sorry, the room is already full.'
   else
-    req.session.current_user ?= name: "Watcher", id: null
-  res.render 'index', current_user: req.session.current_user
+    colour = colours[parseInt(Math.random(1) * colours.length)]
+    req.session.current_user ?= name: "player #{++playerCount}", id: playerCount, colour: colour
+    res.render 'index', current_user: req.session.current_user
 
 app.listen 3000
 
@@ -49,13 +48,14 @@ io.sockets.on 'connection', (socket) ->
   chess = chesses['test']
 
   socket.on 'move', (data) ->
-    console.log "new message - #{data}"
-    chess.move current_user, data.x, data.y
-    socket.broadcast.emit 'allNews', {x: data.x, y: data.y, colour: current_user.colour}
+    if chess.move current_user, data.x, data.y
+      socket.broadcast.emit 'allNews', {x: data.x, y: data.y, colour: current_user.colour}
 
   socket.on 'register', (data) ->
     chess.join current_user
-    socket.emit 'register', canMove: chess.nextMovePlayer() is current_user
+    # when the second player join, send a sign to first player to tell him can start.
+    if chess.isFull()
+      socket.broadcast.emit 'register', canMove: true
 
   socket.on 'disconnect', ->
     console.log 'a client disconnected...'
