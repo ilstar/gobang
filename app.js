@@ -1,5 +1,5 @@
 (function() {
-  var Chess, Player, app, chesses, express, io, parseCookie, sessionStore;
+  var Chess, Player, app, chesses, express, io, parseCookie, port, sessionStore;
 
   express = require('express');
 
@@ -50,7 +50,9 @@
     }
   });
 
-  app.listen(3000);
+  port = process.env.PORT || 3000;
+
+  app.listen(port);
 
   io.set('authorization', function(data, callback) {
     var sessionID;

@@ -24,7 +24,8 @@ app.get '/', (req, res) ->
     req.session.current_user ?= new Player
     res.render 'index', current_user: req.session.current_user
 
-app.listen 3000
+port = process.env.PORT || 3000
+app.listen port
 
 io.set 'authorization', (data, callback) ->
   if data.headers.cookie?
