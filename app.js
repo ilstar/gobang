@@ -38,19 +38,30 @@
 
   app.get('/', function(req, res) {
     var _base;
-    if (chesses['test'].isFull()) {
-      return res.send('Sorry, the room is already full.');
-    } else {
-      if ((_base = req.session).current_user == null) {
-        _base.current_user = new Player;
-      }
-      return res.render('index', {
-        current_user: req.session.current_user
-      });
+    if ((_base = req.session).current_user == null) {
+      _base.current_user = new Player;
     }
+    return res.render('index', {
+      current_user: req.session.current_user
+    });
   });
 
-  port = process.env.PORT || 3000;
+  app.post('/rooms', function(req, res) {
+    var roomId;
+    roomId = "" + req.session.current_user.id + "-" + (new Date().getTime());
+    return res.redirect("/" + roomId);
+  });
+
+  app.get('/:id', function(req, res) {
+    var chess;
+    chess = chesses[req.params.id];
+    if (!(chess != null)) chess = chesses[req.params.id] = new Chess;
+    return res.render('chess', {
+      current_user: req.session.current_user
+    });
+  });
+
+  port = process.env.PORT || 5000;
 
   app.listen(port);
 

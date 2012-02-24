@@ -15,16 +15,28 @@ app.use express.cookieParser()
 app.use express.session secret: "secret string $#@$", store: sessionStore
 
 chesses = {}
-chesses['test'] = new Chess
 
 app.get '/', (req, res) ->
-  if chesses['test'].isFull()
-    res.send 'Sorry, the room is already full.'
-  else
-    req.session.current_user ?= new Player
-    res.render 'index', current_user: req.session.current_user
+  req.session.current_user ?= new Player
+  console.log req.session.current_user
+  res.render 'index'
 
-port = process.env.PORT || 3000
+app.post '/rooms', (req, res) ->
+  console.log req.session.current_user
+  roomId = "#{req.session.current_user.id}-#{new Date().getTime()}"
+
+  res.redirect "/rooms/#{roomId}"
+
+app.get '/rooms/:id', (req, res) ->
+  req.session.current_user ?= new Player
+  roomId = req.params.id
+  chesses[roomId] ?= new Chess
+
+  req.session.current_user.roomId ?= roomId
+
+  res.render 'chess', current_user: req.session.current_user
+
+port = process.env.PORT || 5000
 app.listen port
 
 io.set 'authorization', (data, callback) ->
@@ -47,8 +59,7 @@ io.configure ->
 
 io.sockets.on 'connection', (socket) ->
   current_user = socket.handshake.session.current_user
-  console.log current_user
-  chess = chesses['test']
+  chess = chesses[current_user.roomId]
 
   socket.on 'move', (data) ->
     result = chess.move current_user, parseInt(data.x), parseInt(data.y)
