@@ -1,3 +1,5 @@
+require "#{__dirname}/../lib/array_ext"
+
 class Chess
   constructor: ->
     @players = []
@@ -59,8 +61,7 @@ class Chess
     horizontalChessX = []
     xs = [(lastChess.x - 4)..(lastChess.x + 4)]
     for c in chess when c.y is lastChess.y
-      index = xs.indexOf c.x
-      xs.splice index, 1
+      xs.remove c.x
     return true if xs[0] is lastChess.x + 1 # first five
     return true if xs[xs.length - 1] is lastChess.x - 1 # last five
     for i in [1..xs.length - 1]
@@ -70,8 +71,7 @@ class Chess
     verticalChessX = []
     ys = [(lastChess.y - 4)..(lastChess.y + 4)]
     for c in chess when c.x is lastChess.x
-      index = ys.indexOf c.y
-      ys.splice index, 1
+      ys.remove c.y
     return true if ys[0] is lastChess.y + 1 # top five
     return true if ys[ys.length - 1] is lastChess.y - 1 # bottom five
     for i in [1..ys.length - 1]
