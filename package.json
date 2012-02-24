@@ -8,7 +8,8 @@
     "supervisor":"0.3.0",
     "ejs":"0.6.1",
     "connect":"1.8.5",
-    "jasmine-node":"1.0.21"
+    "jasmine-node":"1.0.21",
+    "coffee-script":"1.2.0"
   }
 }
 
