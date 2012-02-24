@@ -72,6 +72,11 @@
     }
   });
 
+  io.configure(function() {
+    io.set('transports', ['xhr-polling']);
+    return io.set('polling duration', 10);
+  });
+
   io.sockets.on('connection', function(socket) {
     var chess, current_user;
     current_user = socket.handshake.session.current_user;

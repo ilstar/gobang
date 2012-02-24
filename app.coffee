@@ -40,6 +40,11 @@ io.set 'authorization', (data, callback) ->
   else
     callback new Error "No cookie transmitted!"
 
+# for running on heroku
+io.configure ->
+  io.set 'transports', ['xhr-polling']
+  io.set 'polling duration', 10
+
 io.sockets.on 'connection', (socket) ->
   current_user = socket.handshake.session.current_user
   console.log current_user
