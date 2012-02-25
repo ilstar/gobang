@@ -4,8 +4,8 @@ io = require('socket.io').listen app
 sessionStore = new express.session.MemoryStore
 require 'ejs'
 parseCookie = require('connect').utils.parseCookie
-Chess = require "#{__dirname}/models/chess"
-Player = require "#{__dirname}/models/player"
+
+global.chesses = {}
 
 # setting
 app.set 'view engine', 'ejs'
@@ -14,27 +14,12 @@ app.use express.static(__dirname + '/public')
 app.use express.cookieParser()
 app.use express.session secret: "secret string $#@$", store: sessionStore
 
-chesses = {}
+homeRoute = require "#{__dirname}/routes/home"
+chessRoomRoute = require "#{__dirname}/routes/chess_room"
 
-app.get '/', (req, res) ->
-  req.session.current_user ?= new Player
-  console.log req.session.current_user
-  res.render 'index'
-
-app.post '/rooms', (req, res) ->
-  console.log req.session.current_user
-  roomId = "#{req.session.current_user.id}-#{new Date().getTime()}"
-
-  res.redirect "/rooms/#{roomId}"
-
-app.get '/rooms/:id', (req, res) ->
-  req.session.current_user ?= new Player
-  roomId = req.params.id
-  chesses[roomId] ?= new Chess
-
-  req.session.current_user.roomId ?= roomId
-
-  res.render 'chess', current_user: req.session.current_user
+app.get '/', homeRoute.index
+app.post '/rooms', chessRoomRoute.create
+app.get '/rooms/:id', chessRoomRoute.show
 
 port = process.env.PORT || 5000
 app.listen port
