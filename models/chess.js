@@ -8,11 +8,12 @@
     function Chess() {
       this.players = [];
       this.chess = {};
+      this.winner = null;
     }
 
     Chess.prototype.join = function(player) {
       if (this.isFull()) return;
-      this.players = this.players.concat(player);
+      this.players.push(player);
       this.chess[player.id] = [];
       if (this.player1 != null) {
         this.player2 = player;
@@ -26,14 +27,26 @@
       return this.players.length === 2;
     };
 
+    Chess.prototype.reset = function() {
+      this.winner = null;
+      this.chess[this.player1.id] = [];
+      return this.chess[this.player2.id] = [];
+    };
+
+    Chess.prototype.isWinner = function(player) {
+      if (!(this.winner != null)) return false;
+      return this.winner.id === player.id;
+    };
+
     Chess.prototype.move = function(player, x, y) {
       if (!this.canMove(player)) return;
       if (this.positionBeTaken(x, y)) return;
-      this.chess[player.id] = this.chess[player.id].concat({
+      this.chess[player.id].push({
         x: x,
         y: y
       });
       if (this.isWin(player)) {
+        this.winner = player;
         return 'win';
       } else {
         return 'moved';

@@ -177,6 +177,7 @@ describe "Jasmine", ->
         @chess.move @player1, 5, 1 # player1 win
 
         expect(@chess.isWin(@player1)).toEqual true
+        expect(@chess.winner).toEqual @player1
 
       it "last point in first", ->
         @chess.move @player1, 5, 1

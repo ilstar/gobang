@@ -1,5 +1,5 @@
 (function() {
-  var Chess, Player, app, chesses, express, io, parseCookie, port, sessionStore;
+  var app, chessRoomRoute, express, homeRoute, io, parseCookie, port, sessionStore;
 
   express = require('express');
 
@@ -13,9 +13,7 @@
 
   parseCookie = require('connect').utils.parseCookie;
 
-  Chess = require("" + __dirname + "/models/chess");
-
-  Player = require("" + __dirname + "/models/player");
+  global.chesses = {};
 
   app.set('view engine', 'ejs');
 
@@ -32,34 +30,15 @@
     store: sessionStore
   }));
 
-  chesses = {};
+  homeRoute = require("" + __dirname + "/routes/home");
 
-  chesses['test'] = new Chess;
+  chessRoomRoute = require("" + __dirname + "/routes/chess_room");
 
-  app.get('/', function(req, res) {
-    var _base;
-    if ((_base = req.session).current_user == null) {
-      _base.current_user = new Player;
-    }
-    return res.render('index', {
-      current_user: req.session.current_user
-    });
-  });
+  app.get('/', homeRoute.index);
 
-  app.post('/rooms', function(req, res) {
-    var roomId;
-    roomId = "" + req.session.current_user.id + "-" + (new Date().getTime());
-    return res.redirect("/" + roomId);
-  });
+  app.post('/rooms', chessRoomRoute.create);
 
-  app.get('/:id', function(req, res) {
-    var chess;
-    chess = chesses[req.params.id];
-    if (!(chess != null)) chess = chesses[req.params.id] = new Chess;
-    return res.render('chess', {
-      current_user: req.session.current_user
-    });
-  });
+  app.get('/rooms/:id', chessRoomRoute.show);
 
   port = process.env.PORT || 5000;
 
@@ -91,11 +70,13 @@
   io.sockets.on('connection', function(socket) {
     var chess, current_user;
     current_user = socket.handshake.session.current_user;
-    console.log(current_user);
-    chess = chesses['test'];
+    chess = chesses[current_user.roomId];
     socket.on('move', function(data) {
       var result;
+      console.log(chess);
       result = chess.move(current_user, parseInt(data.x), parseInt(data.y));
+      console.log(chess);
+      console.log(result);
       if (result === 'moved') {
         return socket.broadcast.emit('allNews', {
           x: data.x,
@@ -116,6 +97,15 @@
       if (chess.isFull()) {
         return socket.broadcast.emit('register', {
           canMove: true
+        });
+      }
+    });
+    socket.on('reset_chess', function() {
+      if (chess.isWinner(current_user)) {
+        chess.reset();
+        socket.broadcast.emit('reset_chess');
+        return socket.emit('reset_chess', {
+          user_id: current_user.id
         });
       }
     });

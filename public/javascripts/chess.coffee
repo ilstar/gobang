@@ -3,6 +3,9 @@ colour = "#efd"
 drawItem = (x, y, colour) ->
   $("td[data-x=#{x}][data-y=#{y}]").attr('bgcolor', colour)
 
+resetChessRoom = ->
+  $('td[bgcolor]').removeAttr 'bgcolor'
+
 user = window.user
 socket = io.connect null
 
@@ -10,8 +13,14 @@ socket.on 'connect', ->
   socket.emit 'register'
 
 socket.on 'allNews', (data) ->
+  console.log data
   drawItem(data.x, data.y, data.colour)
   user.canMove = true
+
+socket.on 'reset_chess', (data) ->
+  resetChessRoom()
+  if data?
+    user.canMove = true if data.user_id is user.id
 
 socket.on 'win', (data) ->
   if data.user is 'you'
@@ -36,3 +45,6 @@ jQuery ->
       user.canMove = false
     else
       alert "you can't move"
+
+  $('#reset_chess').click ->
+    socket.emit('reset_chess')

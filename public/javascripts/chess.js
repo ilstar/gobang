@@ -1,10 +1,14 @@
 (function() {
-  var colour, drawItem, socket, user;
+  var colour, drawItem, resetChessRoom, socket, user;
 
   colour = "#efd";
 
   drawItem = function(x, y, colour) {
     return $("td[data-x=" + x + "][data-y=" + y + "]").attr('bgcolor', colour);
+  };
+
+  resetChessRoom = function() {
+    return $('td[bgcolor]').removeAttr('bgcolor');
   };
 
   user = window.user;
@@ -16,8 +20,14 @@
   });
 
   socket.on('allNews', function(data) {
+    console.log(data);
     drawItem(data.x, data.y, data.colour);
     return user.canMove = true;
+  });
+
+  socket.on('reset_chess', function(data) {
+    resetChessRoom();
+    if (data != null) if (data.user_id === user.id) return user.canMove = true;
   });
 
   socket.on('win', function(data) {
@@ -35,7 +45,7 @@
   socket.on('disconnect', function() {});
 
   jQuery(function() {
-    return $('td').click(function() {
+    $('td').click(function() {
       var $item, x, y;
       if (user.canMove) {
         $item = $(this);
@@ -51,6 +61,9 @@
       } else {
         return alert("you can't move");
       }
+    });
+    return $('#reset_chess').click(function() {
+      return socket.emit('reset_chess');
     });
   });
 

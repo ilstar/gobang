@@ -4,6 +4,7 @@ class Chess
   constructor: ->
     @players = []
     @chess = {}
+    @winner = null
 
   join: (player) ->
     return if @isFull()
@@ -16,12 +17,22 @@ class Chess
   isFull: ->
     @players.length is 2
 
+  reset: ->
+    @winner = null
+    @chess[@player1.id] = []
+    @chess[@player2.id] = []
+  
+  isWinner: (player) ->
+    return false if not @winner?
+    @winner.id is player.id
+
   move: (player, x, y) ->
     return if not @canMove(player)
     return if @positionBeTaken(x, y)
     @chess[player.id].push {x, y}
 
     if @isWin player
+      @winner = player
       'win'
     else
       'moved'
