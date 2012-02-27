@@ -8,7 +8,7 @@ class Chess
   join: (player) ->
     return if @isFull()
 
-    @players = @players.concat player
+    @players.push player
     @chess[player.id] = []
     if @player1? then @player2 = player else @player1 = player
     return player
@@ -19,7 +19,7 @@ class Chess
   move: (player, x, y) ->
     return if not @canMove(player)
     return if @positionBeTaken(x, y)
-    @chess[player.id] = @chess[player.id].concat {x, y}
+    @chess[player.id].push {x, y}
 
     if @isWin player
       'win'
