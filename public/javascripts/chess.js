@@ -20,14 +20,13 @@
   });
 
   socket.on('allNews', function(data) {
-    console.log(data);
     drawItem(data.x, data.y, data.colour);
     return user.canMove = true;
   });
 
   socket.on('reset_chess', function(data) {
     resetChessRoom();
-    if (data != null) if (data.user_id === user.id) return user.canMove = true;
+    if (data === 'start') return user.canMove = true;
   });
 
   socket.on('win', function(data) {
@@ -41,8 +40,6 @@
   socket.on('register', function(data) {
     return user.canMove = data.canMove;
   });
-
-  socket.on('disconnect', function() {});
 
   jQuery(function() {
     $('td').click(function() {

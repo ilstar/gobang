@@ -47,10 +47,7 @@ io.sockets.on 'connection', (socket) ->
   chess = chesses[current_user.roomId]
 
   socket.on 'move', (data) ->
-    console.log chess
     result = chess.move current_user, parseInt(data.x), parseInt(data.y)
-    console.log chess
-    console.log result
     if result is 'moved'
       socket.broadcast.emit 'allNews', {x: data.x, y: data.y, colour: current_user.colour}
     else if result is 'win'
@@ -67,7 +64,7 @@ io.sockets.on 'connection', (socket) ->
     if chess.isWinner(current_user)
       chess.reset()
       socket.broadcast.emit 'reset_chess'
-      socket.emit 'reset_chess', user_id: current_user.id
+      socket.emit 'reset_chess', 'start'
 
   socket.on 'disconnect', ->
     console.log 'a client disconnected...'

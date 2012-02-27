@@ -73,10 +73,7 @@
     chess = chesses[current_user.roomId];
     socket.on('move', function(data) {
       var result;
-      console.log(chess);
       result = chess.move(current_user, parseInt(data.x), parseInt(data.y));
-      console.log(chess);
-      console.log(result);
       if (result === 'moved') {
         return socket.broadcast.emit('allNews', {
           x: data.x,
@@ -104,9 +101,7 @@
       if (chess.isWinner(current_user)) {
         chess.reset();
         socket.broadcast.emit('reset_chess');
-        return socket.emit('reset_chess', {
-          user_id: current_user.id
-        });
+        return socket.emit('reset_chess', 'start');
       }
     });
     return socket.on('disconnect', function() {

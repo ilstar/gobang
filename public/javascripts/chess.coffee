@@ -13,14 +13,13 @@ socket.on 'connect', ->
   socket.emit 'register'
 
 socket.on 'allNews', (data) ->
-  console.log data
   drawItem(data.x, data.y, data.colour)
   user.canMove = true
 
 socket.on 'reset_chess', (data) ->
   resetChessRoom()
-  if data?
-    user.canMove = true if data.user_id is user.id
+  if data is 'start'
+    user.canMove = true
 
 socket.on 'win', (data) ->
   if data.user is 'you'
@@ -31,7 +30,6 @@ socket.on 'win', (data) ->
 socket.on 'register', (data) ->
   # data format: {canMove: true/false}
   user.canMove = data.canMove
-socket.on 'disconnect', ->
 
 jQuery ->
   $('td').click ->

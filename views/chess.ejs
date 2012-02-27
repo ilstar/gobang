@@ -6,7 +6,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript" charset="utf-8"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8">
-      var user = {name: "<%= current_user.name %>", id: <%= current_user.id %>}
+      var user = {name: "<%= current_user.name %>", colour: "<%= current_user.colour %>"}
     </script>
     <script src="/javascripts/chess.js"></script>
     <% var boardLength = 18; %>
