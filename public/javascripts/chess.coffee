@@ -4,7 +4,7 @@ drawItem = (x, y, colour) ->
 resetChessRoom = ->
   $('td[bgcolor]').removeAttr 'bgcolor'
 
-user = window.user
+user = {}
 socket = io.connect null
 
 socket.on 'connect', ->

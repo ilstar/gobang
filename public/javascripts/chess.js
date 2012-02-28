@@ -9,7 +9,7 @@
     return $('td[bgcolor]').removeAttr('bgcolor');
   };
 
-  user = window.user;
+  user = {};
 
   socket = io.connect(null);
 

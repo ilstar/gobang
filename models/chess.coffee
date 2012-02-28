@@ -5,14 +5,19 @@ class Chess
     @players = []
     @chess = {}
     @winner = null
+    @colours = ['#eee', '#abc', '#ebc', '#daf']
 
   join: (player) ->
     return if @isFull()
 
     @players.push player
+    @assignColour(player)
     @chess[player.id] = []
     if @player1? then @player2 = player else @player1 = player
     return player
+
+  assignColour: (player) ->
+    player.colour = @colours.remove(@colours[parseInt(Math.random(1) * @colours.length)])
 
   isFull: ->
     @players.length is 2

@@ -14,6 +14,7 @@
     Chess.prototype.join = function(player) {
       if (this.isFull()) return;
       this.players.push(player);
+      this.assignColour(player);
       this.chess[player.id] = [];
       if (this.player1 != null) {
         this.player2 = player;
@@ -21,6 +22,11 @@
         this.player1 = player;
       }
       return player;
+    };
+
+    Chess.prototype.assignColour = function(player) {
+      if (this.colours == null) this.colours = ['#eee', '#abc', '#ebc', '#daf'];
+      return player.colour = this.colours.remove(this.colours[parseInt(Math.random(1) * this.colours.length)]);
     };
 
     Chess.prototype.isFull = function() {

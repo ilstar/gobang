@@ -30,6 +30,32 @@ describe "Jasmine", ->
     it "can't join because it's full", ->
       expect(@chess.join new Player).toBe undefined
 
+    it "assign a colour to player", ->
+      chess = new Chess
+      player = new Player
+      expect(player.colour).toEqual undefined
+
+      chess.join player
+
+      expect(player.colour).toNotEqual undefined
+
+  describe "assignColour", ->
+    it "colour will not same", ->
+      chess = new Chess
+      p1 = new Player
+      p2 = new Player
+
+      expect(p1.colour).toEqual undefined
+      expect(p2.colour).toEqual undefined
+
+      chess.colours = ['#eee', '#abc']
+      chess.join p1
+      chess.join p2
+
+      expect(chess.colours).toEqual []
+      expect(p1.colour).toNotEqual undefined
+      expect(p2.colour).toNotEqual undefined
+
   describe "isFull", ->
     it "can when nobody join", ->
       chess = new Chess
