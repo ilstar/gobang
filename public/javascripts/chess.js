@@ -1,7 +1,5 @@
 (function() {
-  var colour, drawItem, resetChessRoom, socket, user;
-
-  colour = "#efd";
+  var drawItem, resetChessRoom, socket, user;
 
   drawItem = function(x, y, colour) {
     return $("td[data-x=" + x + "][data-y=" + y + "]").attr('bgcolor', colour);
@@ -21,7 +19,7 @@
 
   socket.on('allNews', function(data) {
     drawItem(data.x, data.y, data.colour);
-    return user.canMove = true;
+    return user.canMove = data.user !== 'me';
   });
 
   socket.on('reset_chess', function(data) {
@@ -46,15 +44,12 @@
       var $item, x, y;
       if (user.canMove) {
         $item = $(this);
-        x = $item.attr('data-x');
-        y = $item.attr('data-y');
-        drawItem(x, y, colour);
-        user.canMove = false;
-        socket.emit('move', {
+        x = $item.data('x');
+        y = $item.data('y');
+        return socket.emit('move', {
           x: x,
           y: y
         });
-        return user.canMove = false;
       } else {
         return alert("you can't move");
       }

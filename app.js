@@ -75,10 +75,17 @@
       var result;
       result = chess.move(current_user, parseInt(data.x), parseInt(data.y));
       if (result === 'moved') {
-        return socket.broadcast.emit('allNews', {
+        socket.broadcast.emit('allNews', {
           x: data.x,
           y: data.y,
-          colour: current_user.colour
+          colour: current_user.colour,
+          user: 'other'
+        });
+        return socket.emit('allNews', {
+          x: data.x,
+          y: data.y,
+          colour: current_user.colour,
+          user: 'me'
         });
       } else if (result === 'win') {
         socket.broadcast.emit('win', {

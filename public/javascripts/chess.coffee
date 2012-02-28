@@ -1,5 +1,3 @@
-colour = "#efd"
-
 drawItem = (x, y, colour) ->
   $("td[data-x=#{x}][data-y=#{y}]").attr('bgcolor', colour)
 
@@ -14,7 +12,7 @@ socket.on 'connect', ->
 
 socket.on 'allNews', (data) ->
   drawItem(data.x, data.y, data.colour)
-  user.canMove = true
+  user.canMove = data.user isnt 'me'
 
 socket.on 'reset_chess', (data) ->
   resetChessRoom()
@@ -35,12 +33,9 @@ jQuery ->
   $('td').click ->
     if user.canMove
       $item = $(this)
-      x = $item.attr('data-x')
-      y = $item.attr('data-y')
-      drawItem(x, y, colour)
-      user.canMove = false
+      x = $item.data('x')
+      y = $item.data('y')
       socket.emit('move', {x, y})
-      user.canMove = false
     else
       alert "you can't move"
 
