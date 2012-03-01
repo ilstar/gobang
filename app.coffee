@@ -1,18 +1,29 @@
 express = require 'express'
-app = express.createServer()
-io = require('socket.io').listen app
-sessionStore = new express.session.MemoryStore
+# TODO:Do we need this require?
 require 'ejs'
 parseCookie = require('connect').utils.parseCookie
+socketIO = require('socket.io')
 
-global.chesses = {}
+setupWebServer = (sessionStore)->
+  # WebServer
+  app = express.createServer()
+  # setting
+  app.set 'view engine', 'ejs'
+  app.set "view options", layout: false
+  app.use express.static(__dirname + '/public')
+  app.use express.cookieParser()
+  app.use express.session secret: "secret string $#@$", store: sessionStore
+  app
 
-# setting
-app.set 'view engine', 'ejs'
-app.set "view options", layout: false
-app.use express.static(__dirname + '/public')
-app.use express.cookieParser()
-app.use express.session secret: "secret string $#@$", store: sessionStore
+startApp = ->
+  sessionStore = new express.session.MemoryStore
+  app = setupWebServer(sessionStore)
+  # SocketIO
+  io = socketIO.listen app
+  # Domain related
+  global.chesses = {}
+
+startApp()
 
 homeRoute = require "#{__dirname}/routes/home"
 chessRoomRoute = require "#{__dirname}/routes/chess_room"
