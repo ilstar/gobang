@@ -19,7 +19,14 @@ class WebSocket
   constructor: (@app, @sessionStore) ->
     # SocketIO
     @io = socketIO.listen @app
+    @configureOptions()
     @setupFilters ['session']
+
+  configureOptions: ->
+    # for running on heroku
+    @io.configure =>
+      @io.set 'transports', ['xhr-polling']
+      @io.set 'polling duration', 10
 
   sessionFilter: ->
     @io.set 'authorization', (request, callback) =>
@@ -61,10 +68,6 @@ port = process.env.PORT || 5000
 app.listen port
 
 
-# for running on heroku
-io.configure ->
-  io.set 'transports', ['xhr-polling']
-  io.set 'polling duration', 10
 
 io.sockets.on 'connection', (socket) ->
   current_user = socket.handshake.session.current_user

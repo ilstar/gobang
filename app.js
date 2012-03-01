@@ -31,8 +31,17 @@
       this.app = app;
       this.sessionStore = sessionStore;
       this.io = socketIO.listen(this.app);
+      this.configureOptions();
       this.setupFilters(['session']);
     }
+
+    WebSocket.prototype.configureOptions = function() {
+      var _this = this;
+      return this.io.configure(function() {
+        _this.io.set('transports', ['xhr-polling']);
+        return _this.io.set('polling duration', 10);
+      });
+    };
 
     WebSocket.prototype.sessionFilter = function() {
       var _this = this;
@@ -75,8 +84,6 @@
 
   _ref = startApp(), app = _ref[0], io = _ref[1], sessionStore = _ref[2];
 
-  setupWebSocket(io);
-
   homeRoute = require("" + __dirname + "/routes/home");
 
   chessRoomRoute = require("" + __dirname + "/routes/chess_room");
@@ -90,11 +97,6 @@
   port = process.env.PORT || 5000;
 
   app.listen(port);
-
-  io.configure(function() {
-    io.set('transports', ['xhr-polling']);
-    return io.set('polling duration', 10);
-  });
 
   io.sockets.on('connection', function(socket) {
     var chess, current_user;
