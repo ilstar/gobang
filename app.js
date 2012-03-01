@@ -1,5 +1,5 @@
 (function() {
-  var WebSocket, WuziGame, WuziGameSession, app, chessRoomRoute, express, homeRoute, io, parseCookie, port, sessionStore, setupWebServer, socketIO, startApp, _ref,
+  var App, WebSocket, WuziGame, WuziGameSession, app, chessRoomRoute, express, homeRoute, parseCookie, socketIO,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   express = require('express');
@@ -10,21 +10,9 @@
 
   socketIO = require('socket.io');
 
-  setupWebServer = function(sessionStore) {
-    var app;
-    app = express.createServer();
-    app.set('view engine', 'ejs');
-    app.set("view options", {
-      layout: false
-    });
-    app.use(express.static(__dirname + '/public'));
-    app.use(express.cookieParser());
-    app.use(express.session({
-      secret: "secret string $#@$",
-      store: sessionStore
-    }));
-    return app;
-  };
+  homeRoute = require("" + __dirname + "/routes/home");
+
+  chessRoomRoute = require("" + __dirname + "/routes/chess_room");
 
   WebSocket = (function() {
 
@@ -162,31 +150,57 @@
 
   })();
 
-  startApp = function() {
-    var app, game, io, sessionStore, socket;
-    sessionStore = new express.session.MemoryStore;
-    app = setupWebServer(sessionStore);
-    socket = new WebSocket(app, sessionStore);
-    game = new WuziGame(socket);
-    io = socket.io;
-    global.chesses = {};
-    return [app, io, sessionStore];
-  };
+  App = (function() {
 
-  _ref = startApp(), app = _ref[0], io = _ref[1], sessionStore = _ref[2];
+    function App() {
+      global.chesses = {};
+      this.prepareWebserver();
+      this.startGame();
+      this.startWebserver();
+    }
 
-  homeRoute = require("" + __dirname + "/routes/home");
+    App.prototype.startWebserver = function() {
+      var port;
+      port = process.env.PORT || 5000;
+      return this.app.listen(port);
+    };
 
-  chessRoomRoute = require("" + __dirname + "/routes/chess_room");
+    App.prototype.prepareWebserver = function() {
+      this.sessionStore = new express.session.MemoryStore;
+      this.app = this.setupWebServer(this.sessionStore);
+      return this.setupRoutes(this.app);
+    };
 
-  app.get('/', homeRoute.index);
+    App.prototype.startGame = function() {
+      this.socket = new WebSocket(this.app, this.sessionStore);
+      return this.game = new WuziGame(this.socket);
+    };
 
-  app.post('/rooms', chessRoomRoute.create);
+    App.prototype.setupRoutes = function(app) {
+      app.get('/', homeRoute.index);
+      app.post('/rooms', chessRoomRoute.create);
+      return app.get('/rooms/:id', chessRoomRoute.show);
+    };
 
-  app.get('/rooms/:id', chessRoomRoute.show);
+    App.prototype.setupWebServer = function(sessionStore) {
+      var app;
+      app = express.createServer();
+      app.set('view engine', 'ejs');
+      app.set("view options", {
+        layout: false
+      });
+      app.use(express.static(__dirname + '/public'));
+      app.use(express.cookieParser());
+      return app.use(express.session({
+        secret: "secret string $#@$",
+        store: sessionStore
+      }));
+    };
 
-  port = process.env.PORT || 5000;
+    return App;
 
-  app.listen(port);
+  })();
+
+  app = new App();
 
 }).call(this);

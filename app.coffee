@@ -4,16 +4,8 @@ require 'ejs'
 parseCookie = require('connect').utils.parseCookie
 socketIO = require('socket.io')
 
-setupWebServer = (sessionStore)->
-  # WebServer
-  app = express.createServer()
-  # setting
-  app.set 'view engine', 'ejs'
-  app.set "view options", layout: false
-  app.use express.static(__dirname + '/public')
-  app.use express.cookieParser()
-  app.use express.session secret: "secret string $#@$", store: sessionStore
-  app
+homeRoute = require "#{__dirname}/routes/home"
+chessRoomRoute = require "#{__dirname}/routes/chess_room"
 
 class WebSocket
   constructor: (@app, @sessionStore) ->
@@ -90,26 +82,41 @@ class WuziGameSession
     @socket.on 'disconnect', ->
       console.log 'a client disconnected...'
 
+class App
+  constructor: ->
+    global.chesses = {}
+    @prepareWebserver()
+    @startGame()
+    @startWebserver()
 
-startApp = ->
-  sessionStore = new express.session.MemoryStore
-  app = setupWebServer sessionStore
-  socket = new WebSocket app, sessionStore
-  game = new WuziGame socket
-  io  = socket.io
-  # Domain related
-  global.chesses = {}
-  [app, io, sessionStore]
+  startWebserver: ->
+    port = process.env.PORT || 5000
+    @app.listen port
 
-[app, io, sessionStore] = startApp()
+  prepareWebserver: ->
+    @sessionStore = new express.session.MemoryStore
+    @app = @setupWebServer @sessionStore
+    @setupRoutes @app
 
-homeRoute = require "#{__dirname}/routes/home"
-chessRoomRoute = require "#{__dirname}/routes/chess_room"
+  startGame: ->
+    @socket = new WebSocket @app, @sessionStore
+    @game = new WuziGame @socket
+  
+  setupRoutes: (app)->
+    app.get '/', homeRoute.index
+    app.post '/rooms', chessRoomRoute.create
+    app.get '/rooms/:id', chessRoomRoute.show
 
-app.get '/', homeRoute.index
-app.post '/rooms', chessRoomRoute.create
-app.get '/rooms/:id', chessRoomRoute.show
+  setupWebServer: (sessionStore)->
+    # WebServer
+    app = express.createServer()
+    # setting
+    app.set 'view engine', 'ejs'
+    app.set "view options", layout: false
+    app.use express.static(__dirname + '/public')
+    app.use express.cookieParser()
+    app.use express.session secret: "secret string $#@$", store: sessionStore
 
-port = process.env.PORT || 5000
-app.listen port
+
+app = new App()
 
