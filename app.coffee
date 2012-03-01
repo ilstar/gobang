@@ -22,8 +22,9 @@ startApp = ->
   io = socketIO.listen app
   # Domain related
   global.chesses = {}
+  [app, io, sessionStore]
 
-startApp()
+[app, io, sessionStore] = startApp()
 
 homeRoute = require "#{__dirname}/routes/home"
 chessRoomRoute = require "#{__dirname}/routes/chess_room"

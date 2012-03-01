@@ -1,34 +1,40 @@
 (function() {
-  var app, chessRoomRoute, express, homeRoute, io, parseCookie, port, sessionStore;
+  var app, chessRoomRoute, express, homeRoute, io, parseCookie, port, setupWebServer, socketIO, startApp, _ref;
 
   express = require('express');
-
-  app = express.createServer();
-
-  io = require('socket.io').listen(app);
-
-  sessionStore = new express.session.MemoryStore;
 
   require('ejs');
 
   parseCookie = require('connect').utils.parseCookie;
 
-  global.chesses = {};
+  socketIO = require('socket.io');
 
-  app.set('view engine', 'ejs');
+  setupWebServer = function(sessionStore) {
+    var app;
+    app = express.createServer();
+    app.set('view engine', 'ejs');
+    app.set("view options", {
+      layout: false
+    });
+    app.use(express.static(__dirname + '/public'));
+    app.use(express.cookieParser());
+    app.use(express.session({
+      secret: "secret string $#@$",
+      store: sessionStore
+    }));
+    return app;
+  };
 
-  app.set("view options", {
-    layout: false
-  });
+  startApp = function() {
+    var app, io, sessionStore;
+    sessionStore = new express.session.MemoryStore;
+    app = setupWebServer(sessionStore);
+    io = socketIO.listen(app);
+    global.chesses = {};
+    return [app, io];
+  };
 
-  app.use(express.static(__dirname + '/public'));
-
-  app.use(express.cookieParser());
-
-  app.use(express.session({
-    secret: "secret string $#@$",
-    store: sessionStore
-  }));
+  _ref = startApp(), app = _ref[0], io = _ref[1];
 
   homeRoute = require("" + __dirname + "/routes/home");
 
