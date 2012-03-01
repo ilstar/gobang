@@ -1,5 +1,5 @@
 (function() {
-  var app, chessRoomRoute, express, homeRoute, io, parseCookie, port, setupWebServer, socketIO, startApp, _ref;
+  var WebSocket, app, chessRoomRoute, express, homeRoute, io, parseCookie, port, sessionStore, setupWebServer, socketIO, startApp, _ref;
 
   express = require('express');
 
@@ -25,16 +25,57 @@
     return app;
   };
 
+  WebSocket = (function() {
+
+    function WebSocket(app, sessionStore) {
+      this.app = app;
+      this.sessionStore = sessionStore;
+      this.io = socketIO.listen(this.app);
+      this.setupFilters(['session']);
+    }
+
+    WebSocket.prototype.sessionFilter = function() {
+      var _this = this;
+      return this.io.set('authorization', function(request, callback) {
+        var sessionID;
+        if (request.headers.cookie != null) {
+          request.cookie = parseCookie(request.headers.cookie);
+          sessionID = request.cookie['connect.sid'];
+          return _this.sessionStore.get(sessionID, function(error, session) {
+            if (error || !session) {
+              return callback(new Error("There's no session"));
+            } else {
+              request.session = session;
+              return callback(null, true);
+            }
+          });
+        } else {
+          return callback(new Error("No cookie transmitted!"));
+        }
+      });
+    };
+
+    WebSocket.prototype.setupFilters = function(name) {
+      return this["" + name + "Filter"]();
+    };
+
+    return WebSocket;
+
+  })();
+
   startApp = function() {
-    var app, io, sessionStore;
+    var app, io, sessionStore, socket;
     sessionStore = new express.session.MemoryStore;
     app = setupWebServer(sessionStore);
-    io = socketIO.listen(app);
+    socket = new WebSocket(app, sessionStore);
+    io = socket.io;
     global.chesses = {};
-    return [app, io];
+    return [app, io, sessionStore];
   };
 
-  _ref = startApp(), app = _ref[0], io = _ref[1];
+  _ref = startApp(), app = _ref[0], io = _ref[1], sessionStore = _ref[2];
+
+  setupWebSocket(io);
 
   homeRoute = require("" + __dirname + "/routes/home");
 
@@ -49,24 +90,6 @@
   port = process.env.PORT || 5000;
 
   app.listen(port);
-
-  io.set('authorization', function(data, callback) {
-    var sessionID;
-    if (data.headers.cookie != null) {
-      data.cookie = parseCookie(data.headers.cookie);
-      sessionID = data.cookie['connect.sid'];
-      return sessionStore.get(sessionID, function(error, session) {
-        if (error || !session) {
-          return callback(new Error("There's no session"));
-        } else {
-          data.session = session;
-          return callback(null, true);
-        }
-      });
-    } else {
-      return callback(new Error("No cookie transmitted!"));
-    }
-  });
 
   io.configure(function() {
     io.set('transports', ['xhr-polling']);

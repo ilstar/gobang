@@ -15,11 +15,35 @@ setupWebServer = (sessionStore)->
   app.use express.session secret: "secret string $#@$", store: sessionStore
   app
 
+class WebSocket
+  constructor: (@app, @sessionStore) ->
+    # SocketIO
+    @io = socketIO.listen @app
+    @setupFilters ['session']
+
+  sessionFilter: ->
+    @io.set 'authorization', (request, callback) =>
+      if request.headers.cookie?
+        request.cookie = parseCookie request.headers.cookie
+        sessionID = request.cookie['connect.sid']
+        @sessionStore.get sessionID, (error, session) ->
+          if error or not session
+            callback new Error "There's no session"
+          else
+            request.session = session
+            callback null, true
+      else
+        callback new Error "No cookie transmitted!"
+
+  setupFilters: (name)->
+    this["#{name}Filter"]()
+
+
 startApp = ->
   sessionStore = new express.session.MemoryStore
-  app = setupWebServer(sessionStore)
-  # SocketIO
-  io = socketIO.listen app
+  app = setupWebServer sessionStore
+  socket = new WebSocket app, sessionStore
+  io  = socket.io
   # Domain related
   global.chesses = {}
   [app, io, sessionStore]
@@ -36,18 +60,6 @@ app.get '/rooms/:id', chessRoomRoute.show
 port = process.env.PORT || 5000
 app.listen port
 
-io.set 'authorization', (data, callback) ->
-  if data.headers.cookie?
-    data.cookie = parseCookie data.headers.cookie
-    sessionID = data.cookie['connect.sid']
-    sessionStore.get sessionID, (error, session) ->
-      if error or not session
-        callback new Error "There's no session"
-      else
-        data.session = session
-        callback null, true
-  else
-    callback new Error "No cookie transmitted!"
 
 # for running on heroku
 io.configure ->
