@@ -41,7 +41,9 @@
           request.cookie = parseCookie(request.headers.cookie);
           sessionID = request.cookie['connect.sid'];
           return _this.sessionStore.get(sessionID, function(error, session) {
-            if (error || !session) {
+            if (error != null) {
+              return callback(new Error(error));
+            } else if (!session) {
               return callback(new Error("There's no session"));
             } else {
               request.session = session;
@@ -66,47 +68,43 @@
 
     function App() {
       global.chesses = {};
-      this.prepareWebserver();
+      this.setupWebServer();
       this.startGame();
-      this.startWebserver();
+      this.startWebServer();
     }
 
-    App.prototype.startWebserver = function() {
+    App.prototype.startWebServer = function() {
       var port;
       port = process.env.PORT || 5000;
       return this.app.listen(port);
     };
 
-    App.prototype.prepareWebserver = function() {
-      this.sessionStore = new express.session.MemoryStore;
-      this.app = this.setupWebServer(this.sessionStore);
-      return this.setupRoutes(this.app);
-    };
-
     App.prototype.startGame = function() {
-      this.socket = new WebSocket(this.app, this.sessionStore);
-      return this.game = new WuziGame(this.socket);
+      var socket;
+      socket = new WebSocket(this.app, this.sessionStore);
+      return new WuziGame(socket);
     };
 
-    App.prototype.setupRoutes = function(app) {
-      app.get('/', homeRoute.index);
-      app.post('/rooms', chessRoomRoute.create);
-      return app.get('/rooms/:id', chessRoomRoute.show);
+    App.prototype.setupRoutes = function() {
+      this.app.get('/', homeRoute.index);
+      this.app.post('/rooms', chessRoomRoute.create);
+      return this.app.get('/rooms/:id', chessRoomRoute.show);
     };
 
-    App.prototype.setupWebServer = function(sessionStore) {
-      var app;
-      app = express.createServer();
-      app.set('view engine', 'ejs');
-      app.set("view options", {
+    App.prototype.setupWebServer = function() {
+      this.sessionStore = new express.session.MemoryStore;
+      this.app = express.createServer();
+      this.app.set('view engine', 'ejs');
+      this.app.set("view options", {
         layout: false
       });
-      app.use(express.static(__dirname + '/public'));
-      app.use(express.cookieParser());
-      return app.use(express.session({
+      this.app.use(express.static(__dirname + '/public'));
+      this.app.use(express.cookieParser());
+      this.app.use(express.session({
         secret: "secret string $#@$",
-        store: sessionStore
+        store: this.sessionStore
       }));
+      return this.setupRoutes();
     };
 
     return App;

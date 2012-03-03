@@ -28,7 +28,9 @@ class WebSocket
         request.cookie = parseCookie request.headers.cookie
         sessionID = request.cookie['connect.sid']
         @sessionStore.get sessionID, (error, session) ->
-          if error or not session
+          if error?
+            callback new Error error
+          else if not session
             callback new Error "There's no session"
           else
             request.session = session
@@ -42,36 +44,35 @@ class WebSocket
 class App
   constructor: ->
     global.chesses = {}
-    @prepareWebserver()
+    @setupWebServer()
     @startGame()
-    @startWebserver()
+    @startWebServer()
 
-  startWebserver: ->
+  startWebServer: ->
     port = process.env.PORT || 5000
     @app.listen port
 
-  prepareWebserver: ->
-    @sessionStore = new express.session.MemoryStore
-    @app = @setupWebServer @sessionStore
-    @setupRoutes @app
-
   startGame: ->
-    @socket = new WebSocket @app, @sessionStore
-    @game = new WuziGame @socket
+    socket = new WebSocket @app, @sessionStore
+    new WuziGame socket
   
-  setupRoutes: (app)->
-    app.get '/', homeRoute.index
-    app.post '/rooms', chessRoomRoute.create
-    app.get '/rooms/:id', chessRoomRoute.show
+  setupRoutes: ->
+    @app.get '/', homeRoute.index
+    @app.post '/rooms', chessRoomRoute.create
+    @app.get '/rooms/:id', chessRoomRoute.show
 
-  setupWebServer: (sessionStore)->
+  setupWebServer: ->
+    @sessionStore = new express.session.MemoryStore
     # WebServer
-    app = express.createServer()
+    @app = express.createServer()
+
     # setting
-    app.set 'view engine', 'ejs'
-    app.set "view options", layout: false
-    app.use express.static(__dirname + '/public')
-    app.use express.cookieParser()
-    app.use express.session secret: "secret string $#@$", store: sessionStore
+    @app.set 'view engine', 'ejs'
+    @app.set "view options", layout: false
+    @app.use express.static(__dirname + '/public')
+    @app.use express.cookieParser()
+    @app.use express.session secret: "secret string $#@$", store: @sessionStore
+
+    @setupRoutes()
 
 module.exports = { WebSocket, App }
