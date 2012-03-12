@@ -24,8 +24,8 @@ class WuziGameSession
       @socket.broadcast.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'other'}
       @socket.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'me'}
     if result is 'win'
-      @socket.broadcast.emit 'notify', "You lost!"
-      @socket.emit 'notify', "Congratulations, you win!"
+      @socket.broadcast.emit 'lost'
+      @socket.emit 'win'
 
   registerListener: (data) =>
     @chess.join @current_user

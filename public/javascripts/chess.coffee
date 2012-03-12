@@ -7,6 +7,8 @@ class GameClient
     @socket.on 'move', @moveListener
     @socket.on 'reset_chess', @resetChessListener
     @socket.on 'notify', @notificationListener
+    @socket.on 'win', @winListener
+    @socket.on 'lost', @lostListener
     @socket.on 'register', @registerListener
 
   move: (x, y) ->
@@ -41,6 +43,13 @@ class GameClient
     if data is 'start'
       @user.canMove = true
 
+  winListener: () ->
+    alert "Congratulations, you become the winner!"
+    $('#reset_chess').show()
+
+  lostListener: () ->
+    alert "Oh so bad, you lost!"
+
   notificationListener: (data) ->
     alert data
 
@@ -64,3 +73,4 @@ jQuery ->
 
   $('#reset_chess').click ->
     game.reset()
+    $(this).hide()

@@ -56,8 +56,8 @@
         });
       }
       if (result === 'win') {
-        this.socket.broadcast.emit('notify', "You lost!");
-        return this.socket.emit('notify', "Congratulations, you win!");
+        this.socket.broadcast.emit('lost');
+        return this.socket.emit('win');
       }
     };
 

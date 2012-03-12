@@ -3,3 +3,6 @@ table tr td {
   padding: 18;
 }
 
+.hidden {
+  display: none;
+}

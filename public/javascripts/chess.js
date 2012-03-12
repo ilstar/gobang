@@ -18,6 +18,8 @@
       this.socket.on('move', this.moveListener);
       this.socket.on('reset_chess', this.resetChessListener);
       this.socket.on('notify', this.notificationListener);
+      this.socket.on('win', this.winListener);
+      this.socket.on('lost', this.lostListener);
       return this.socket.on('register', this.registerListener);
     };
 
@@ -62,6 +64,15 @@
       if (data === 'start') return this.user.canMove = true;
     };
 
+    GameClient.prototype.winListener = function() {
+      alert("Congratulations, you become the winner!");
+      return $('#reset_chess').show();
+    };
+
+    GameClient.prototype.lostListener = function() {
+      return alert("Oh so bad, you lost!");
+    };
+
     GameClient.prototype.notificationListener = function(data) {
       return alert(data);
     };
@@ -93,7 +104,8 @@
       }
     });
     return $('#reset_chess').click(function() {
-      return game.reset();
+      game.reset();
+      return $(this).hide();
     });
   });
 
