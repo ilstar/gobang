@@ -41,20 +41,19 @@
     WuziGameSession.prototype.moveListener = function(data) {
       var result;
       result = this.chess.move(this.current_user, parseInt(data.x), parseInt(data.y));
-      if (result === 'moved') {
-        this.socket.broadcast.emit('move', {
-          x: data.x,
-          y: data.y,
-          colour: this.current_user.colour,
-          user: 'other'
-        });
-        return this.socket.emit('move', {
-          x: data.x,
-          y: data.y,
-          colour: this.current_user.colour,
-          user: 'me'
-        });
-      } else if (result === 'win') {
+      this.socket.broadcast.emit('move', {
+        x: data.x,
+        y: data.y,
+        colour: this.current_user.colour,
+        user: 'other'
+      });
+      this.socket.emit('move', {
+        x: data.x,
+        y: data.y,
+        colour: this.current_user.colour,
+        user: 'me'
+      });
+      if (result === 'win') {
         this.socket.broadcast.emit('notify', "You lost!");
         return this.socket.emit('notify', "Congratulations, you win!");
       }

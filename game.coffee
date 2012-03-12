@@ -20,10 +20,10 @@ class WuziGameSession
 
   moveListener: (data) =>
     result = @chess.move @current_user, parseInt(data.x), parseInt(data.y)
-    if result is 'moved'
-      @socket.broadcast.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'other'}
-      @socket.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'me'}
-    else if result is 'win'
+    @socket.broadcast.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'other'}
+    @socket.emit 'move', {x: data.x, y: data.y, colour: @current_user.colour, user: 'me'}
+
+    if result is 'win'
       @socket.broadcast.emit 'notify', "You lost!"
       @socket.emit 'notify', "Congratulations, you win!"
 
