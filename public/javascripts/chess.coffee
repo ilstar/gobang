@@ -4,9 +4,9 @@ class GameClient
 
   start: ->
     @socket.on 'connect', @connectListener
-    @socket.on 'allNews', @allNewsListener
+    @socket.on 'move', @moveListener
     @socket.on 'reset_chess', @resetChessListener
-    @socket.on 'win', @winListener
+    @socket.on 'notify', @notificationListener
     @socket.on 'register', @registerListener
 
   move: (x, y) ->
@@ -21,11 +21,12 @@ class GameClient
   resetChessRoom: ->
     $('td[bgcolor]').removeAttr 'bgcolor'
 
+  ###### Listeners #######
 
   connectListener: =>
     @socket.emit 'register'
 
-  allNewsListener: (data) =>
+  moveListener: (data) =>
     @drawItem(data.x, data.y, data.colour)
     @user.canMove = data.user isnt 'me'
 
@@ -34,11 +35,8 @@ class GameClient
     if data is 'start'
       @user.canMove = true
 
-  winListener: (data) ->
-    if data.user is 'you'
-      alert 'you win'
-    else
-      alert 'so bad, he win!'
+  notificationListener: (data) ->
+    alert data
 
   registerListener: (data) =>
     # data format: {canMove: true/false}

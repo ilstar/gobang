@@ -8,16 +8,16 @@
       this.user = user;
       this.registerListener = __bind(this.registerListener, this);
       this.resetChessListener = __bind(this.resetChessListener, this);
-      this.allNewsListener = __bind(this.allNewsListener, this);
+      this.moveListener = __bind(this.moveListener, this);
       this.connectListener = __bind(this.connectListener, this);
       this.socket = io.connect(null);
     }
 
     GameClient.prototype.start = function() {
       this.socket.on('connect', this.connectListener);
-      this.socket.on('allNews', this.allNewsListener);
+      this.socket.on('move', this.moveListener);
       this.socket.on('reset_chess', this.resetChessListener);
-      this.socket.on('win', this.winListener);
+      this.socket.on('notify', this.notificationListener);
       return this.socket.on('register', this.registerListener);
     };
 
@@ -44,7 +44,7 @@
       return this.socket.emit('register');
     };
 
-    GameClient.prototype.allNewsListener = function(data) {
+    GameClient.prototype.moveListener = function(data) {
       this.drawItem(data.x, data.y, data.colour);
       return this.user.canMove = data.user !== 'me';
     };
@@ -54,12 +54,8 @@
       if (data === 'start') return this.user.canMove = true;
     };
 
-    GameClient.prototype.winListener = function(data) {
-      if (data.user === 'you') {
-        return alert('you win');
-      } else {
-        return alert('so bad, he win!');
-      }
+    GameClient.prototype.notificationListener = function(data) {
+      return alert(data);
     };
 
     GameClient.prototype.registerListener = function(data) {
