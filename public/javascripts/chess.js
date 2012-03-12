@@ -22,10 +22,14 @@
     };
 
     GameClient.prototype.move = function(x, y) {
-      return this.socket.emit('move', {
-        x: x,
-        y: y
-      });
+      if (this.placeIsTaken(x, y)) {
+        return alert("you can't move here, the place was be taken!");
+      } else {
+        return this.socket.emit('move', {
+          x: x,
+          y: y
+        });
+      }
     };
 
     GameClient.prototype.reset = function() {
@@ -38,6 +42,10 @@
 
     GameClient.prototype.resetChessRoom = function() {
       return $('td[bgcolor]').removeAttr('bgcolor');
+    };
+
+    GameClient.prototype.placeIsTaken = function(x, y) {
+      return $("td[data-x=" + x + "][data-y=" + y + "]").attr('bgcolor') != null;
     };
 
     GameClient.prototype.connectListener = function() {

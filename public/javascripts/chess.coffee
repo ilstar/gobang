@@ -10,7 +10,10 @@ class GameClient
     @socket.on 'register', @registerListener
 
   move: (x, y) ->
-    @socket.emit 'move', {x, y}
+    if @placeIsTaken(x, y)
+      alert "you can't move here, the place was be taken!"
+    else
+      @socket.emit 'move', {x, y}
 
   reset: ->
     @socket.emit 'reset_chess'
@@ -20,6 +23,9 @@ class GameClient
 
   resetChessRoom: ->
     $('td[bgcolor]').removeAttr 'bgcolor'
+
+  placeIsTaken: (x, y) ->
+    $("td[data-x=#{x}][data-y=#{y}]").attr('bgcolor')?
 
   ###### Listeners #######
 
