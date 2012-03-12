@@ -5,29 +5,42 @@ resetChessRoom = ->
   $('td[bgcolor]').removeAttr 'bgcolor'
 
 user = {}
-socket = io.connect null
 
-socket.on 'connect', ->
-  socket.emit 'register'
+class GameClient
+  constructor: ()->
+    @socket = io.connect null
 
-socket.on 'allNews', (data) ->
-  drawItem(data.x, data.y, data.colour)
-  user.canMove = data.user isnt 'me'
+  start: ->
+    @socket.on 'connect', @connectListener
+    @socket.on 'allNews', @allNewsListener
+    @socket.on 'reset_chess', @resetChessListener
+    @socket.on 'win', @winListener
+    @socket.on 'register', @registerListener
 
-socket.on 'reset_chess', (data) ->
-  resetChessRoom()
-  if data is 'start'
-    user.canMove = true
+  connectListener: =>
+    @socket.emit 'register'
 
-socket.on 'win', (data) ->
-  if data.user is 'you'
-    alert 'you win'
-  else
-    alert 'so bad, he win!'
+  allNewsListener: (data) ->
+    drawItem(data.x, data.y, data.colour)
+    user.canMove = data.user isnt 'me'
 
-socket.on 'register', (data) ->
-  # data format: {canMove: true/false}
-  user.canMove = data.canMove
+  resetChessListener: (data) ->
+    resetChessRoom()
+    if data is 'start'
+      user.canMove = true
+
+  winListener: (data) ->
+    if data.user is 'you'
+      alert 'you win'
+    else
+      alert 'so bad, he win!'
+
+  registerListener: (data) ->
+    # data format: {canMove: true/false}
+    user.canMove = data.canMove
+
+game = new GameClient
+game.start()
 
 jQuery ->
   $('td').click ->
@@ -35,9 +48,9 @@ jQuery ->
       $item = $(this)
       x = $item.data('x')
       y = $item.data('y')
-      socket.emit('move', {x, y})
+      game.socket.emit('move', {x, y})
     else
       alert "you can't move"
 
   $('#reset_chess').click ->
-    socket.emit('reset_chess')
+    game.socket.emit('reset_chess')

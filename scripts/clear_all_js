@@ -1,2 +1,2 @@
 #!/bin/sh
-rm lib/*.js models/*.js *.js public/javascripts/*.js
+rm lib/*.js models/*.js *.js public/javascripts/*.js routes/*.js

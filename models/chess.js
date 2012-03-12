@@ -9,6 +9,7 @@
       this.players = [];
       this.chess = {};
       this.winner = null;
+      this.colours = ['#eee', '#abc', '#ebc', '#daf'];
     }
 
     Chess.prototype.join = function(player) {
@@ -25,7 +26,6 @@
     };
 
     Chess.prototype.assignColour = function(player) {
-      if (this.colours == null) this.colours = ['#eee', '#abc', '#ebc', '#daf'];
       return player.colour = this.colours.remove(this.colours[parseInt(Math.random(1) * this.colours.length)]);
     };
 
